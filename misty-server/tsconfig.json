@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Node",
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "allowJs": true,
+        "outDir": "dist",
+        "resolveJsonModule": true,
+        "types": ["bun-types"]
+    },
+    "include": ["src"],
+    "exclude": ["node_modules", "dist"]
+}
