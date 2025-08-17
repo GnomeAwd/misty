@@ -11,13 +11,12 @@
     "db:push": "bunx drizzle-kit push"
   },
   "dependencies": {
-    "better-sqlite3": "^12.2.0",
-    "drizzle-orm": "^0.44.0",
+    "@libsql/client": "^0.15.11",
+    "drizzle-orm": "^0.44.4",
     "hono": "^4.6.5",
     "musicbrainz-api": "^0.25.1"
   },
   "devDependencies": {
-    "@types/better-sqlite3": "^7.6.13",
     "@types/bun": "^1.2.20",
     "@types/node": "^24.3.0",
     "drizzle-kit": "^0.31.4"
