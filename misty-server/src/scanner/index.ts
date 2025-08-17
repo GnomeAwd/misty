@@ -1,11 +1,16 @@
 import { CoverArtArchiveApi, MusicBrainzApi } from "musicbrainz-api";
 import { db } from "../db";
-import { albums, artists } from "../db/schema";
+import { albums, artists, songs } from "../db/schema";
 import { sql, eq } from "drizzle-orm";
 import { type ResultSet } from "@libsql/client/sqlite3";
 import pino from "pino";
 import { sleep } from "bun";
+import { log } from "console";
+import path, { extname } from "path";
+import { stat } from "fs/promises";
 const { readdir } = await import("fs/promises");
+import { parseFile, type IAudioMetadata } from "music-metadata";
+import { spawn } from "child_process";
 
 const logger = pino();
 const MUSICBRAINZ_APP_NAME = process.env.MUSICBRAINZ_APP_NAME || "Misty";
@@ -14,6 +19,8 @@ const MUSICBRAINZ_CONTACT_EMAIL = process.env.MUSICBRAINZ_CONTACT_EMAIL || "";
 
 const LAST_FM_API_KEY = process.env.LAST_FM_API_KEY || "";
 const FAN_ART_TV_API_KEY = process.env.FAN_ART_TV_API_KEY || "";
+
+const AUDIO_EXT = new Set([".mp3", ".flac", ".m4a", ".ogg", ".wav", ".wma"]);
 
 const mb = new MusicBrainzApi({
   appName: MUSICBRAINZ_APP_NAME,
@@ -114,9 +121,19 @@ export const scan = async (musicFolder: string) => {
         artistId
       );
     }
+
+    const allArtistAlbums = await db
+      .select()
+      .from(albums)
+      .where(eq(albums.artistId, artistId));
+
+    if (allArtistAlbums.length === 0) {
+      logger.warn(`No albums found for artist ID: ${artistId}`);
+      continue;
+    }
+
+    saveSongData(allArtistAlbums);
   }
-  // TODO: Tag songs of corresponding albums
-  // TODO: Get song metadata from API
 
   return { directories: artistsFolders };
 };
@@ -159,7 +176,6 @@ const saveAlbumData = async (
       files.filter((file) => file.isDirectory()).map((file) => file.name)
     );
 
-    // Match releases to folders
     let matchedReleases = releases.flatMap((release) => {
       const matchedFolder = folders.find((folder) => {
         const f = normalize(folder);
@@ -188,7 +204,6 @@ const saveAlbumData = async (
 
     const existingPaths = new Set(existingAlbums.map((a) => a.folderPath));
 
-    // 🔹 Filter out already existing folderPaths
     matchedReleases = matchedReleases.filter(
       (release) => !existingPaths.has(release.folderPath)
     );
@@ -295,14 +310,6 @@ async function getCoverArtForReleaseGroup(rgId: string): Promise<string> {
   }
 }
 
-const getAlbumMetadata = async (album: string) => {
-  // TODO: Implement API call to get album metadata
-};
-
-const getSongMetadata = async (song: string) => {
-  // TODO: Implement API call to get song metadata
-};
-
 async function fetchFanartArtistAssets(
   artistMBID: string
 ): Promise<FanartArtistAssets | null> {
@@ -337,4 +344,328 @@ async function fetchFanartArtistAssets(
     hdmusiclogo: extract(data?.hdmusiclogo),
     musicbanner: extract(data?.musicbanner),
   };
+}
+
+const saveSongData = async (albumEntries: any[]) => {
+  const rows: any[] = [];
+
+  for (const album of albumEntries) {
+    if (!album.musicbrainzId) {
+      logger.warn(
+        `Album ID ${album.id} has no MusicBrainz ID, skipping song fetching`
+      );
+      continue;
+    }
+
+    const insertedSongs = await db
+      .select()
+      .from(songs)
+      .where(eq(songs.albumId, album.id));
+
+    const audioFiles = await listAudioFiles(album.folderPath);
+    if (audioFiles.length === 0) {
+      logger.warn(`No audio files found in album folder: ${album.folderPath}`);
+      continue;
+    }
+
+    // Fetch all recordings (songs) for this album from MusicBrainz
+    logger.info(
+      `Fetching recordings for album ${album.title} (${album.musicbrainzId})`
+    );
+    const mbSongs = await getMusicBrainzRecordings(album.musicbrainzId);
+
+    if (!mbSongs || mbSongs.length === 0) {
+      logger.warn(
+        `No MusicBrainz recordings found for album ${album.title}, using local metadata`
+      );
+      // Fall back to processing files with local metadata
+      for (const filePath of audioFiles) {
+        await processSongFile(filePath, album, insertedSongs, rows);
+      }
+      continue;
+    }
+
+    // Match audio files to MusicBrainz recordings based on title/track number
+    logger.info(
+      `Matching ${audioFiles.length} files to ${mbSongs.length} MusicBrainz recordings`
+    );
+
+    for (const filePath of audioFiles) {
+      // Get basic metadata from file for matching
+      const basicMetadata = await getBasicFileMetadata(filePath);
+      if (!basicMetadata) {
+        logger.error(`Failed to extract basic metadata from file: ${filePath}`);
+        continue;
+      }
+
+      // Check if song already exists in DB
+      if (
+        insertedSongs.some((song) => song.filePath === filePath) ||
+        rows.some((row) => row.filePath === filePath)
+      ) {
+        logger.info(`Song already exists in database: ${filePath}`);
+        continue;
+      }
+
+      // Find matching MusicBrainz recording
+      const matchedRecording = findMatchingRecording(basicMetadata, mbSongs);
+
+      if (matchedRecording) {
+        logger.info(
+          `Matched file ${path.basename(filePath)} to MusicBrainz recording "${
+            matchedRecording.title
+          }"`
+        );
+
+        rows.push({
+          title: matchedRecording.title,
+          duration: matchedRecording.duration,
+          trackNumber: matchedRecording.position || basicMetadata.track_number,
+          musicbrainzId: matchedRecording.id,
+          fileSize: basicMetadata.file_size,
+          fileName: path.basename(filePath),
+          filePath,
+          albumId: album.id,
+          artistId: album.artistId,
+        });
+      } else {
+        // Fall back to file metadata if no match found
+        logger.warn(
+          `No MusicBrainz match found for file: ${path.basename(
+            filePath
+          )}, using file metadata`
+        );
+        await processSongFile(filePath, album, insertedSongs, rows);
+      }
+    }
+  }
+  if (rows.length === 0) {
+    logger.info("No new songs to insert.");
+    return;
+  }
+  const res: void | ResultSet = await db
+    .insert(songs)
+    .values(rows)
+    .catch((err) => {
+      logger.error("Failed to insert songs into database:", err);
+    });
+  logger.info(`Inserted ${res?.toJSON().rowsAffected} new songs into database`);
+  return res?.toJSON().rowsAffected || 0;
+};
+
+
+async function getMusicBrainzRecordings(albumMbid: string): Promise<
+  Array<{
+    id: string;
+    title: string;
+    position: number;
+    duration: number;
+  }>
+> {
+  try {
+    const releaseData = await mb.lookup("release-group", albumMbid, [
+      "releases",
+    ]);
+
+    if (!releaseData.releases || releaseData.releases.length === 0) {
+      logger.warn(`No releases found for release group ${albumMbid}`);
+      return [];
+    }
+
+    const releaseId = releaseData.releases[0].id;
+
+    const release = await mb.lookup("release", releaseId, ["recordings"]);
+
+    if (!release.media || release.media.length === 0) {
+      logger.warn(`No media found in release ${releaseId}`);
+      return [];
+    }
+
+    const recordings: Array<{
+      id: string;
+      title: string;
+      position: number;
+      duration: number;
+    }> = [];
+
+    for (const medium of release.media) {
+      if (!medium.tracks) continue;
+
+      for (const track of medium.tracks) {
+        if (!track.recording) continue;
+
+        recordings.push({
+          id: track.recording.id,
+          title: track.title || track.recording.title,
+          position: track.position,
+          duration: track.length ? Math.round(track.length / 1000) : 0,
+        });
+      }
+    }
+
+    return recordings;
+  } catch (error) {
+    logger.error(
+      `Failed to fetch MusicBrainz recordings for ${albumMbid}: ${
+        error instanceof Error ? error.message : String(error)
+      }`
+    );
+    return [];
+  }
+}
+
+async function listAudioFiles(dir: string): Promise<string[]> {
+  try {
+    const entries = await readdir(dir, { withFileTypes: true });
+    return entries
+      .filter(
+        (f) => f.isFile() && AUDIO_EXT.has(path.extname(f.name).toLowerCase())
+      )
+      .map((f) => path.join(dir, f.name));
+  } catch {
+    return [];
+  }
+}
+
+async function getSongMetadata(filePath: string): Promise<{
+  title: string;
+  track_number: number;
+  duration: number;
+  file_size: number;
+  raw?: any;
+}> {
+  try {
+    const stats = await stat(filePath);
+    const mm: IAudioMetadata = await parseFile(filePath);
+    const common: any = mm.common || {};
+    const format: any = mm.format || {};
+    const title = (common.title ||
+      path.basename(filePath, path.extname(filePath))) as string;
+    const tn = common.track?.no || 0;
+    // Use format.duration directly as fallback
+    const duration = format.duration ? Math.floor(format.duration) : 0;
+    return {
+      title,
+      track_number: typeof tn === "number" ? tn : 0,
+      duration,
+      file_size: stats.size,
+      raw: { common, format },
+    };
+  } catch {
+    const stats = await stat(filePath).catch(() => ({ size: 0 } as any));
+    return {
+      title: path.basename(filePath, path.extname(filePath)),
+      track_number: 0,
+      duration: 0,
+      file_size: Number(stats?.size || 0),
+    };
+  }
+}
+
+async function getBasicFileMetadata(filePath: string): Promise<{
+  title: string;
+  track_number: number;
+  file_size: number;
+} | null> {
+  try {
+    const stats = await stat(filePath);
+    const mm: IAudioMetadata = await parseFile(filePath);
+    const common: any = mm.common || {};
+    const title = (common.title ||
+      path.basename(filePath, path.extname(filePath))) as string;
+    const tn = common.track?.no || 0;
+    return {
+      title,
+      track_number: typeof tn === "number" ? tn : 0,
+      file_size: stats.size,
+    };
+  } catch (err) {
+    logger.error(
+      `Failed to extract basic metadata from ${filePath}: ${
+        err instanceof Error ? err.message : String(err)
+      }`
+    );
+    return null;
+  }
+}
+
+async function processSongFile(
+  filePath: string,
+  album: any,
+  insertedSongs: any[],
+  rows: any[]
+): Promise<void> {
+  const metadata = await getSongMetadata(filePath);
+  if (!metadata) {
+    logger.error(`Failed to retrieve metadata for file: ${filePath}`);
+    return;
+  }
+
+  rows.push({
+    title: metadata.title,
+    duration: metadata.duration,
+    trackNumber: metadata.track_number,
+    fileSize: metadata.file_size,
+    fileName: path.basename(filePath),
+    filePath,
+    albumId: album.id,
+    artistId: album.artistId,
+  });
+}
+
+function findMatchingRecording(
+  fileMetadata: { title: string; track_number: number },
+  mbRecordings: Array<{
+    id: string;
+    title: string;
+    position: number;
+    duration: number;
+  }>
+) {
+  if (fileMetadata.track_number > 0) {
+    const trackMatch = mbRecordings.find(
+      (rec) => rec.position === fileMetadata.track_number
+    );
+    if (trackMatch) return trackMatch;
+  }
+
+  const normalizedFileTitle = normalize(fileMetadata.title);
+
+  let bestMatch = null;
+  let bestScore = 0;
+
+  for (const recording of mbRecordings) {
+    const normalizedMbTitle = normalize(recording.title);
+
+    let score = 0;
+    if (normalizedFileTitle === normalizedMbTitle) {
+      score = 100; 
+    } else if (
+      normalizedFileTitle.includes(normalizedMbTitle) ||
+      normalizedMbTitle.includes(normalizedFileTitle)
+    ) {
+      score = 80;
+    } else {
+      const fileTitleWords = normalizedFileTitle.split(/[\s\-_]+/);
+      const mbTitleWords = normalizedMbTitle.split(/[\s\-_]+/);
+
+      const commonWords = fileTitleWords.filter((word) =>
+        mbTitleWords.some(
+          (mbWord) => mbWord.includes(word) || word.includes(mbWord)
+        )
+      );
+
+      score =
+        (commonWords.length /
+          Math.max(fileTitleWords.length, mbTitleWords.length)) *
+        70;
+    }
+
+    if (score > bestScore) {
+      bestScore = score;
+      bestMatch = recording;
+    }
+  }
+
+  return bestScore >= 50 ? bestMatch : null;
 }
