@@ -1,11 +1,15 @@
 import { Hono } from "hono";
 import { serveStatic } from "hono/bun";
 import { scan } from "./scanner";
+import { timeout } from 'hono/timeout'
 
 const app = new Hono();
 const MUSIC_FOLDER = Bun.env.MUSIC_FOLDER;
 
-app.use("/*", serveStatic({ root: "../misty-client/build" }));
+app.use("/*", serveStatic({ root: "../misty-client/build"}));
+
+app.use("/api", timeout(25000));
+
 
 app.get("/api/scan", async (c) => {
 
@@ -21,4 +25,7 @@ app.get("/api/scan", async (c) => {
   return c.json(result);
 });
 
-export default app;
+export default {
+  fetch: app.fetch,
+  idleTimeout: 60
+}
