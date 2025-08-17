@@ -4,13 +4,10 @@ import { albums, artists, songs } from "../db/schema";
 import { sql, eq } from "drizzle-orm";
 import { type ResultSet } from "@libsql/client/sqlite3";
 import pino from "pino";
-import { sleep } from "bun";
-import { log } from "console";
 import path, { extname } from "path";
 import { stat } from "fs/promises";
 const { readdir } = await import("fs/promises");
 import { parseFile, type IAudioMetadata } from "music-metadata";
-import { spawn } from "child_process";
 
 const logger = pino();
 const MUSICBRAINZ_APP_NAME = process.env.MUSICBRAINZ_APP_NAME || "Misty";
@@ -203,10 +200,19 @@ const saveAlbumData = async (
       .where(eq(albums.artistId, artistId));
 
     const existingPaths = new Set(existingAlbums.map((a) => a.folderPath));
-
-    matchedReleases = matchedReleases.filter(
-      (release) => !existingPaths.has(release.folderPath)
-    );
+    const usedFolderPaths = new Set<string>();
+    matchedReleases = matchedReleases.filter(release => {
+      if (existingPaths.has(release.folderPath)) {
+        return false;
+      }
+      
+      if (usedFolderPaths.has(release.folderPath)) {
+        logger.warn(`Duplicate folder path detected: ${release.folderPath}. Skipping release: ${release.title}`);
+        return false;
+      }
+      usedFolderPaths.add(release.folderPath);
+      return true;
+    });
 
     if (matchedReleases.length === 0) {
       logger.info(
@@ -368,7 +374,6 @@ const saveSongData = async (albumEntries: any[]) => {
       continue;
     }
 
-    // Fetch all recordings (songs) for this album from MusicBrainz
     logger.info(
       `Fetching recordings for album ${album.title} (${album.musicbrainzId})`
     );
@@ -378,27 +383,21 @@ const saveSongData = async (albumEntries: any[]) => {
       logger.warn(
         `No MusicBrainz recordings found for album ${album.title}, using local metadata`
       );
-      // Fall back to processing files with local metadata
       for (const filePath of audioFiles) {
         await processSongFile(filePath, album, insertedSongs, rows);
       }
       continue;
     }
-
-    // Match audio files to MusicBrainz recordings based on title/track number
     logger.info(
       `Matching ${audioFiles.length} files to ${mbSongs.length} MusicBrainz recordings`
     );
 
     for (const filePath of audioFiles) {
-      // Get basic metadata from file for matching
       const basicMetadata = await getBasicFileMetadata(filePath);
       if (!basicMetadata) {
         logger.error(`Failed to extract basic metadata from file: ${filePath}`);
         continue;
       }
-
-      // Check if song already exists in DB
       if (
         insertedSongs.some((song) => song.filePath === filePath) ||
         rows.some((row) => row.filePath === filePath)
@@ -407,7 +406,6 @@ const saveSongData = async (albumEntries: any[]) => {
         continue;
       }
 
-      // Find matching MusicBrainz recording
       const matchedRecording = findMatchingRecording(basicMetadata, mbSongs);
 
       if (matchedRecording) {
@@ -429,7 +427,6 @@ const saveSongData = async (albumEntries: any[]) => {
           artistId: album.artistId,
         });
       } else {
-        // Fall back to file metadata if no match found
         logger.warn(
           `No MusicBrainz match found for file: ${path.basename(
             filePath
