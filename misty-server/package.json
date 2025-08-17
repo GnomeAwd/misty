@@ -13,7 +13,8 @@
   "dependencies": {
     "better-sqlite3": "^12.2.0",
     "drizzle-orm": "^0.44.0",
-    "hono": "^4.6.5"
+    "hono": "^4.6.5",
+    "musicbrainz-api": "^0.25.1"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
