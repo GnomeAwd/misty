@@ -40,7 +40,7 @@ export const albums = sqliteTable("albums", {
     .references(() => artists.id, { onDelete: "cascade" })
     .notNull(),
   musicbrainzId: text("musicbrainz_id"),
-  folderPath: text("folder_path"),
+  folderPath: text("folder_path").notNull(),
   albumArtUrl: text("album_art_url"),
   releaseDate: integer("release_date", { mode: "timestamp" }),
   totalTracks: integer("total_tracks"),
