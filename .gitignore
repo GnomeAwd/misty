@@ -1,0 +1,9 @@
+sqlite.db
+node_modules
+.env
+.env.*
+!.env.example
+!.env.test
+
+drizzle/
+*.lock
