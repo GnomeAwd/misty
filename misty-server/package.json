@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "bun run --watch src/server.ts",
+    "dev": "bun run --watch src/server.ts | bunx pino-pretty",
     "start": "bun run src/server.ts",
     "studio": "bunx drizzle-kit studio",
     "db:generate": "bunx drizzle-kit generate",
@@ -14,7 +14,9 @@
     "@libsql/client": "^0.15.11",
     "drizzle-orm": "^0.44.4",
     "hono": "^4.6.5",
-    "musicbrainz-api": "^0.25.1"
+    "musicbrainz-api": "^0.25.1",
+    "pino": "^9.9.0",
+    "pino-pretty": "^13.1.1"
   },
   "devDependencies": {
     "@types/bun": "^1.2.20",

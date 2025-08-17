@@ -3,9 +3,10 @@ import { db } from "../db";
 import { artists } from "../db/schema";
 import { sql } from "drizzle-orm";
 import {type ResultSet } from "@libsql/client/sqlite3";
-
+import pino from "pino";
 const { readdir } = await import("fs/promises");
 
+const logger = pino();
 const MUSICBRAINZ_APP_NAME = process.env.MUSICBRAINZ_APP_NAME || "Misty";
 const MUSICBRAINZ_APP_VERSION = process.env.MUSICBRAINZ_APP_VERSION || "0.1";
 const MUSICBRAINZ_CONTACT_EMAIL = process.env.MUSICBRAINZ_CONTACT_EMAIL || "";
@@ -48,7 +49,7 @@ export const scan = async (musicFolder: string) => {
     return { error: "Missing Fan Art TV key" };
   }
 
-  console.log(`Scanning music folder: ${musicFolder}`);
+  logger.info(`Scanning music folder: ${musicFolder}`);
   const folders = await readdir(musicFolder, { withFileTypes: true });
   const artistsFolders = folders
     .filter((folder) => folder.isDirectory())
@@ -64,17 +65,19 @@ export const scan = async (musicFolder: string) => {
       .from(artists)
       .where(sql`${artists.folderPath} = ${musicFolder + "/" + artistFolder}`);
     if (artistDb.length !== 0) {
+      logger.info(`Artist ${artistFolder} already exists in the database.`);
       let artistId = artistDb[0].artistId;
     } else {
       let artistEntry = await getArtistMetadata(artistFolder, musicFolder + "/" + artistFolder);
       if (!artistEntry) {
-        console.log(`Failed to retrieve metadata for artist: ${artistFolder}`);
+        logger.error(`Failed to retrieve metadata for artist: ${artistFolder}`);
         break;
       }
       const result:void|ResultSet = await db.insert(artists).values(artistEntry).catch((err) => {
-        console.error(`Failed to insert artist ${artistFolder} into database:`, err);
+        logger.error(`Failed to insert artist ${artistFolder} into database:`, err);
       });
       let artistId = result?.toJSON().lastInsertRowid;
+      logger.info(`Inserted artist ${artistFolder} into database`);
     }
   }
   // TODO: Tag albums of corresponding artists
@@ -128,8 +131,8 @@ const getArtistMetadata = async (artist: string, folderPath:string) => {
     artistEntry.folderPath = folderPath;
 
     return artistEntry;
-  } catch (e) {
-    console.error(`Error fetching artist metadata for ${artist}:`, e);
+  } catch (e: any) {
+    logger.error(`Error fetching artist metadata for ${artist}:`, e);
   }
 };
 
