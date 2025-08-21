@@ -132,7 +132,7 @@ export const scan = async (musicFolder: string) => {
     saveSongData(allArtistAlbums);
   }
 
-  return { directories: artistsFolders };
+  return { success:200 };
 };
 
 function normalize(str: string) {
