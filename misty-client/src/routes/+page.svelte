@@ -1,7 +1,5 @@
 <script>
-	import Button from '$lib/components/ui/button/button.svelte';
-
-	
+	import { SiteHeader } from '$lib/components/site-header';
 </script>
-
+<SiteHeader/>
 <span>Home</span>

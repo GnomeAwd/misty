@@ -52,9 +52,9 @@
   }
 </script>
 
-<Sidebar.Root collapsible="icon" {...restProps}>
-  <Sidebar.Header>
-    <div class="px-4 flex items-start justify-start gap-4">
+<Sidebar.Root collapsible="offcanvas" {...restProps} >
+  <Sidebar.Header class="bg-background border-b boder-primary">
+    <div class="px-4 flex items-start justify-start gap-4 py-4">
 			<MistyLogo />
 			<div class="flex w-full gap-2 items-center justify-between text-left text-sm leading-tight">
 			  <span class="truncate font-semibold text-sm tracking-widest">
@@ -64,10 +64,10 @@
 			</div>
     </div>
   </Sidebar.Header>
-  <Sidebar.Content>
+  <Sidebar.Content class="bg-background">
     <NavMain items={data.navMain}/>
   </Sidebar.Content>
-  <Sidebar.Footer>
-    <NavSecondary items={data.navSecondary}/>
+  <Sidebar.Footer class="mb-24 bg-background" >
+    <NavSecondary/>
   </Sidebar.Footer>
 </Sidebar.Root>
