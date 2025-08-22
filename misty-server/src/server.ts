@@ -1,25 +1,54 @@
 import { Hono } from "hono";
 import { serveStatic } from "hono/bun";
 import { scan } from "./scanner";
-import { timeout } from 'hono/timeout'
+import { timeout } from "hono/timeout";
+import { getAllSongs } from "./getters/songs";
+import { playSong } from "./player";
+import pino from "pino";
+
+const logger = pino();
+
 
 const app = new Hono();
 const MUSIC_FOLDER = Bun.env.MUSIC_FOLDER;
 
-app.use("/*", serveStatic({ root: "../misty-client/build"}));
+app.use("/*", serveStatic({ root: "../misty-client/build" }));
 
 app.use("/api", timeout(25000));
 
+app.get("/api/get-all-songs", async (c) => {
+  try {
+    const songs = await getAllSongs();
+    return c.json(songs);
+  } catch (err) {
+    return c.json({ error: "Failed to fetch songs" }, 500);
+  }
+});
+
+app.get("api/play-song/:id", async (c) => {
+  const id = c.req.param("id");
+  if (!id) {
+    return c.json({ error: "Song ID is required" }, 400);
+  }
+  const songData = await playSong(Number(id));
+
+  logger.info(songData);
+  if (songData instanceof Response) {
+    return songData;
+  }
+  if (!songData) {
+    return c.json({ error: "Song not found" }, 404);
+  }
+
+})
 
 app.get("/api/scan", async (c) => {
-
   if (!MUSIC_FOLDER) {
     return c.json(
       { error: "MUSIC_FOLDER environment variable is not set" },
       400
     );
   }
-
   const result = await scan(MUSIC_FOLDER);
 
   return c.json(result);
@@ -27,5 +56,5 @@ app.get("/api/scan", async (c) => {
 
 export default {
   fetch: app.fetch,
-  idleTimeout: 60
-}
+  idleTimeout: 60,
+};
