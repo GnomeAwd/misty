@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { serveStatic } from "hono/bun";
+import { cors } from "hono/cors";
 import { scan } from "./scanner";
 import { timeout } from "hono/timeout";
 import { getAllSongs } from "./getters/songs";
@@ -12,6 +13,35 @@ const logger = pino();
 
 const app = new Hono();
 const MUSIC_FOLDER = Bun.env.MUSIC_FOLDER;
+
+// Enable permissive CORS for the Vite dev server (5173) only in development
+const isDev = (Bun.env.NODE_ENV ?? "development") !== "production";
+if (isDev) {
+  const allowedOrigins = new Set([
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+  ]);
+  app.use(
+    "/api/*",
+    cors({
+  origin: (origin) => (origin && allowedOrigins.has(origin) ? origin : null),
+      allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      allowHeaders: [
+        "Content-Type",
+        "Authorization",
+        "Accept",
+        "Origin",
+        "User-Agent",
+        "DNT",
+        "Cache-Control",
+        "X-Requested-With",
+      ],
+      exposeHeaders: ["Content-Length"],
+      credentials: true,
+      maxAge: 86400,
+    })
+  );
+}
 
 app.use("/*", serveStatic({ root: "../misty-client/build" }));
 
