@@ -19,7 +19,7 @@
 <Sidebar.Provider style="--sidebar-width: calc(var(--spacing) * 72); --header-height: calc(var(--spacing) * 12);" >
   <AppSidebar variant="sidebar" />
   <Sidebar.Inset class="flex flex-col items-start justify-start">
-    <div class="flex h-full  max-h-screen flex-col items-start justify-between overflow-hidden">
+    <div class="flex h-full  max-h-screen flex-col w-full items-start justify-between overflow-hidden">
       <ScrollArea class="h-[80vh] w-full rounded-2xl overflow-hidden relative">
         {@render children?.()}
       </ScrollArea>

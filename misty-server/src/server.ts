@@ -25,7 +25,7 @@ app.get("/api/get-all-songs", async (c) => {
   }
 });
 
-app.get("api/play-song/:id", async (c) => {
+app.get("/api/play-song/:id", async (c) => {
   const id = c.req.param("id");
   if (!id) {
     return c.json({ error: "Song ID is required" }, 400);
