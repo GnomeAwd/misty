@@ -16,11 +16,11 @@
 </svelte:head>
 
 <ModeWatcher/>
-<Sidebar.Provider style="--sidebar-width: calc(var(--spacing) * 72); --header-height: calc(var(--spacing) * 12);" >
-  <AppSidebar variant="sidebar" />
-  <Sidebar.Inset class="flex flex-col items-start justify-start">
-    <div class="flex h-full  max-h-screen flex-col w-full items-start justify-between overflow-hidden">
-      <ScrollArea class="h-[80vh] w-full rounded-2xl overflow-hidden relative">
+<Sidebar.Provider style="--sidebar-width: calc(var(--spacing) * 72); --header-height: calc(var(--spacing) * 12);" class='bg-muted'>
+  <AppSidebar variant="floating" />
+  <Sidebar.Inset class="flex flex-col items-start justify-start max-h-[91vh] bg-muted p-2 pl-0 peer-data-[state=collapsed]:pl-2">
+    <div class="flex max-h-screen flex-col w-full items-start justify-between overflow-hidden">
+      <ScrollArea class="w-full rounded-lg overflow-hidden relative">
         {@render children?.()}
       </ScrollArea>
 		</div>
