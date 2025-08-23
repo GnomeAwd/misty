@@ -5,9 +5,10 @@ import { timeout } from "hono/timeout";
 import { getAllSongs } from "./getters/songs";
 import { playSong } from "./player";
 import pino from "pino";
+import { getAllArtists } from "./getters/artists";
+import { getAllAlbumsByArtistId } from "./getters/albums";
 
 const logger = pino();
-
 
 const app = new Hono();
 const MUSIC_FOLDER = Bun.env.MUSIC_FOLDER;
@@ -15,6 +16,28 @@ const MUSIC_FOLDER = Bun.env.MUSIC_FOLDER;
 app.use("/*", serveStatic({ root: "../misty-client/build" }));
 
 app.use("/api", timeout(25000));
+
+app.get("/api/get-all-artists", async (c) => {
+  try {
+    const artists = await getAllArtists();
+    return c.json(artists);
+  } catch (err) {
+    return c.json({ error: "Failed to fetch artists" }, 500);
+  }
+});
+
+app.get("/api/get-artist-albums/:id", async (c) => {
+  const id = c.req.param("id");
+  if (!id) {
+    return c.json({ error: "Artist ID is required" }, 400);
+  }
+  try {
+    const albums = await getAllAlbumsByArtistId(Number(id));
+    return c.json(albums);
+  } catch (err) {
+    return c.json({ error: "Failed to fetch albums" }, 500);
+  }
+});
 
 app.get("/api/get-all-songs", async (c) => {
   try {
@@ -39,8 +62,7 @@ app.get("/api/play-song/:id", async (c) => {
   if (!songData) {
     return c.json({ error: "Song not found" }, 404);
   }
-
-})
+});
 
 app.get("/api/scan", async (c) => {
   if (!MUSIC_FOLDER) {
