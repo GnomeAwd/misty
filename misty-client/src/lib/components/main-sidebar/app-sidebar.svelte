@@ -52,8 +52,8 @@
   }
 </script>
 
-<Sidebar.Root collapsible="offcanvas" {...restProps} >
-  <Sidebar.Header class="bg-background border-b boder-primary">
+<Sidebar.Root collapsible="offcanvas" {...restProps} class="max-h-[91vh] " >
+  <Sidebar.Header>
     <div class="px-4 flex items-start justify-start gap-4 py-4">
 			<MistyLogo />
 			<div class="flex w-full gap-2 items-center justify-between text-left text-sm leading-tight">
@@ -64,10 +64,10 @@
 			</div>
     </div>
   </Sidebar.Header>
-  <Sidebar.Content class="bg-background">
+  <Sidebar.Content>
     <NavMain items={data.navMain}/>
   </Sidebar.Content>
-  <Sidebar.Footer class="mb-24 bg-background" >
+  <Sidebar.Footer >
     <NavSecondary/>
   </Sidebar.Footer>
 </Sidebar.Root>

@@ -40,24 +40,24 @@
 		<Sidebar.Menu>
 			<Sidebar.MenuItem>
 				<div class="mt-4 flex w-full items-center justify-between">
-					<Button variant="outline" size="icon">
+					<Button variant="ghost" size="icon">
 						<Heart class="h-5 w-5" />
 					</Button>
-					<Button variant="outline" size="icon">
+					<Button variant="ghost" size="icon">
 						<Clock class="h-5 w-5" />
 					</Button>
-					<Button onclick={handleScan} variant="outline" size="icon">
+					<Button onclick={handleScan} variant="ghost" size="icon">
 						<RotateClockwise class="mx-2 h-5 w-5" />
 					</Button>
 
-					<Button onclick={toggleMode} variant="outline" size="icon">
+					<Button onclick={toggleMode} variant="ghost" size="icon">
 						<Sun class="h-5 w-5 rotate-0 scale-100 !transition-all dark:-rotate-90 dark:scale-0" />
 						<Moon
 							class="absolute h-5 w-5 rotate-90 scale-0 !transition-all dark:rotate-0 dark:scale-100"
 						/>
 						<span class="sr-only">Toggle theme</span>
 					</Button>
-					<Button variant="outline" size="icon">
+					<Button variant="ghost" size="icon">
 						<DotsVertical class="h-5 w-5" />
 					</Button>
 				</div>
