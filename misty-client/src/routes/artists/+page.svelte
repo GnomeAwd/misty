@@ -9,9 +9,6 @@
     let { data }: { data: PageData } = $props();
     const artists = $derived(data.artists);
 
-    $effect(() => {
-        console.log(artists);
-    });
 </script>
 <div class="flex flex-col items-start justify-start w-full h-[90.5vh] p-4 bg-background gap-4">
     <div class="w-full flex items-center justify-between gap-2">

@@ -67,14 +67,14 @@
   }
 </script>
 
-<div class="fixed bottom-0 left-0 z-[999] w-full px-2">
-	<div class="bg-background  h-[9vh] w-full rounded-t-xl">
-		<div class="flex h-full w-full items-center justify-between gap-4 px-4">
-			<div class="flex w-[300px] items-center justify-start gap-2">
+<div class="fixed bottom-0 left-0 z-[999] w-full p-2">
+	<div class="bg-background  h-full w-full rounded-lg">
+		<div class="flex h-[8.5vh] w-full items-center justify-between gap-4 px-2">
+			<div class="flex w-[300px] items-center justify-start gap-2 hover:bg-muted/20 rounded-md">
 				<img
 					src="https://images.unsplash.com/photo-1499364615650-ec38552f4f34?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8YmFuZHxlbnwwfHwwfHx8MA%3D%3D"
 					alt="album_art"
-					class="w-18 h-18 object-cover object-center rounded-2xl"
+					class="w-18 h-18 object-cover object-center rounded-md"
 				/>
 				<div class="flex flex-col items-start justify-between gap-1">
 					<span class="text-base font-bold">Stinkfist</span>

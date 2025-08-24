@@ -6,7 +6,7 @@ import { timeout } from "hono/timeout";
 import { getAllSongs } from "./getters/songs";
 import { playSong } from "./player";
 import pino from "pino";
-import { getAllArtists } from "./getters/artists";
+import { getAllArtists, getArtistById } from "./getters/artists";
 import { getAllAlbumsByArtistId } from "./getters/albums";
 
 const logger = pino();
@@ -53,6 +53,19 @@ app.get("/api/get-all-artists", async (c) => {
     return c.json(artists);
   } catch (err) {
     return c.json({ error: "Failed to fetch artists" }, 500);
+  }
+});
+
+app.get("/api/get-artist/:id", async (c) => {
+  const id = c.req.param("id");
+  if (!id) {
+    return c.json({ error: "Artist ID is required" }, 400);
+  }
+  try {
+    const artist = await getArtistById(Number(id));
+    return c.json(artist);
+  } catch (err) {
+    return c.json({ error: "Failed to fetch artist" }, 500);
   }
 });
 
