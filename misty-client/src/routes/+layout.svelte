@@ -16,9 +16,9 @@
 </svelte:head>
 
 <ModeWatcher/>
-<Sidebar.Provider style="--sidebar-width: calc(var(--spacing) * 72); --header-height: calc(var(--spacing) * 12);" class='bg-muted'>
+<Sidebar.Provider style="--sidebar-width: calc(var(--spacing) * 72); --header-height: calc(var(--spacing) * 12);" class='bg-background dark:bg-muted'>
   <AppSidebar variant="floating" />
-  <Sidebar.Inset class="flex flex-col items-start justify-start max-h-[91vh] bg-muted p-2 pl-0 peer-data-[state=collapsed]:pl-2">
+  <Sidebar.Inset class="flex flex-col items-start justify-start max-h-[91vh] bg-background dark:bg-muted p-2 pl-0 peer-data-[state=collapsed]:pl-2 ">
     <div class="flex max-h-screen flex-col w-full items-start justify-between overflow-hidden">
       <ScrollArea class="w-full rounded-lg overflow-hidden relative">
         {@render children?.()}

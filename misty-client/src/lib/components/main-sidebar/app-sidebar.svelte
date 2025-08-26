@@ -52,7 +52,7 @@
   }
 </script>
 
-<Sidebar.Root collapsible="offcanvas" {...restProps} class="max-h-[91vh] " >
+<Sidebar.Root collapsible="offcanvas" {...restProps} class="max-h-[91vh]" >
   <Sidebar.Header>
     <div class="px-4 flex items-start justify-start gap-4 py-4">
 			<MistyLogo />
