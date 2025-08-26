@@ -27,7 +27,7 @@
     $inspect(artist)
 </script>
 <div class="flex flex-col items-start justify-start w-full h-[90.5vh] bg-muted dark:bg-background gap-4">
-    <div class="w-full relative h-64 overflow-hidden">
+    <div class="w-full relative h-48 overflow-hidden">
         <div class="w-full h-full bg-gradient-to-b from-transparent via-muted/50 to-muted dark:to-background dark:via-background/50 absolute bottom-0 left-0"></div>
         <img src={artist.artistBannerUrl} alt="artist banner" class="w-full object-cover h-full" />
     </div>
