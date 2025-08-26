@@ -8,5 +8,7 @@ export const load: PageLoad = async ({ params, fetch }) => {
 	const artist = await res.json();
     const albumRes = await fetch(`${baseUrl}/api/get-artist-albums/${slug}`);
     const albums = await albumRes.json();
-	return { artist, albums };
+	const songsRes = await fetch(`${baseUrl}/api/get-all-artists-songs/${slug}`);
+	const songs = await songsRes.json();
+	return { artist, albums, songs };
 };

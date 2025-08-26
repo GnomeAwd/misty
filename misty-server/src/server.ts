@@ -3,7 +3,7 @@ import { serveStatic } from "hono/bun";
 import { cors } from "hono/cors";
 import { scan } from "./scanner";
 import { timeout } from "hono/timeout";
-import { getAllSongs } from "./getters/songs";
+import { getAllSongs, getAllSongsByArtistId } from "./getters/songs";
 import { playSong } from "./player";
 import pino from "pino";
 import { getAllArtists, getArtistById } from "./getters/artists";
@@ -79,6 +79,19 @@ app.get("/api/get-artist-albums/:id", async (c) => {
     return c.json(albums);
   } catch (err) {
     return c.json({ error: "Failed to fetch albums" }, 500);
+  }
+});
+
+app.get("/api/get-all-artists-songs/:id", async (c) => {
+  const id = c.req.param("id");
+  if (!id) {
+    return c.json({ error: "Artist ID is required" }, 400);
+  }
+  try {
+    const songs = await getAllSongsByArtistId(Number(id));
+    return c.json(songs);
+  } catch (err) {
+    return c.json({ error: "Failed to fetch songs" }, 500);
   }
 });
 
