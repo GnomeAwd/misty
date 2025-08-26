@@ -67,8 +67,8 @@
   }
 </script>
 
-<div class="fixed bottom-0 left-0 z-[999] w-full p-2">
-	<div class="bg-background  h-full w-full rounded-lg">
+<div class="fixed bottom-0 left-0 z-[999] w-full p-2 ">
+	<div class="bg-muted dark:bg-background  h-full w-full rounded-lg">
 		<div class="flex h-[8.5vh] w-full items-center justify-between gap-4 px-2">
 			<div class="flex w-[300px] items-center justify-start gap-2 hover:bg-muted/20 rounded-md">
 				<img
