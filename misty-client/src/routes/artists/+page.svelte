@@ -10,7 +10,7 @@
     const artists = $derived(data.artists);
 
 </script>
-<div class="flex flex-col items-start justify-start w-full h-[90.5vh] p-4 bg-background gap-4">
+<div class="flex flex-col items-start justify-start w-full h-[90.5vh] p-4 bg-muted dark:bg-background gap-4">
     <div class="w-full flex items-center justify-between gap-2">
         <Button variant="outline" class="bg-background hover:bg-muted/20 dark:bg-background dark:hover:bg-muted/20">Filters</Button>
         <ToggleGroup.Root variant="outline" type="single" value="grid">
