@@ -80,8 +80,7 @@
 	--sidebar-accent-foreground: oklch(0.8678 0.0929 154.1025);
 	--sidebar-border: oklch(0.3337 0.0364 154.7856);
 	--sidebar-ring: oklch(0.7227 0.1920 149.5793);
-	--font-sans: Alata, ui-sans-serif, sans-serif, system-ui;
-	--font-serif: Besley, ui-serif, serif;
+
 	--font-mono: Fragment Mono, ui-monospace, monospace;
 	--radius: 0.8rem;
 	--shadow-2xs: 0px 2px 4px 0px hsl(0 0% 0% / 0.05);
