@@ -27,13 +27,14 @@
 		formatTime,
 		seekTo,
 	} from '$lib/hooks/music/music-player.svelte';
+	import PlaylistPopover from './playlist-popover.svelte';
 
 
 	let {artists,albums} = $props();
 	let audioElement: HTMLAudioElement;
 
-	// Derived values from the global state
 	const currentSong = $derived(musicPlayerState.currentSong);
+	const playlist = $derived(musicPlayerState.playlist);
 	const isPlaying = $derived(musicPlayerState.isPlaying);
 	const currentTime = $derived(musicPlayerState.currentTime);
 	const duration = $derived(musicPlayerState.duration);
@@ -42,10 +43,8 @@
 	const isMuted = $derived(musicPlayerState.isMuted);
 	const isLoading = $derived(musicPlayerState.isLoading);
 
-	// Progress percentage for the progress bar
 	const progressPercentage = $derived(duration > 0 ? (currentTime / duration) * 100 : 0);
 
-	// Set the audio element reference when the component mounts
 	$effect(() => {
 		if (audioElement) {
 			setAudioElement(audioElement);
@@ -67,7 +66,6 @@
 	function handleProgressKeydown(event: KeyboardEvent) {
 		if (event.key === 'Enter' || event.key === ' ') {
 			event.preventDefault();
-			// For keyboard navigation, seek to 50% by default
 			if (duration > 0) {
 				seekTo(duration * 0.5);
 			}
@@ -104,7 +102,20 @@
 	let albumName = $derived(getAlbumName());
 	let albumArt = $derived(getAlbumArt());
 
-	$inspect(musicPlayerState.playlist )
+	const mapPlaylistToAlbumCovers = () =>{
+		return playlist.map((song) => {
+			const album = albums.find((album:any) => album.id === song.albumId);
+			const artist = artists.find((artist:any) => artist.id === song.artistId);
+			return {
+				...song,
+				artistName: artist ? artist.name : 'Unknown Artist',
+				albumArtUrl: album ? album.albumArtUrl : 'https://images.unsplash.com/photo-1499364615650-ec38552f4f34?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8YmFuZHxlbnwwfHwwfHx8MA%3D%3D',
+			};
+		});
+	}
+
+	let playlistWithCovers = $derived(mapPlaylistToAlbumCovers());
+
 </script>
 
 <div class="fixed bottom-0 left-0 z-[999] w-full p-2 ">
@@ -197,9 +208,7 @@
 				<span class="text-muted-foreground text-xs font-semibold w-[50px] text-center">{formatTime(duration)}</span>
 			</div>
 			<div class="flex items-center justify-center gap-2">
-				<Button variant="ghost" size="icon">
-					<List class="h-5 w-5" />
-				</Button>
+				<PlaylistPopover playlist={playlistWithCovers} currentSong={currentSong} currentSongAlbumArt={albumArt} currentSongArtistName={artistName}/>
 				<Button variant="ghost" size="icon" onclick={toggleMute}>
 					{#if isMuted}
 						<VolumeOff class="h-5 w-5" />
