@@ -91,7 +91,7 @@
 									/>
 								</div>
 								<span class="w-[200px] truncate text-left">{song.title}</span>
-								<span class="text-muted-foreground w-full text-right"
+								<span class="text-muted-foreground w-full text-right text-sm font-light"
 									>{formatSecondCount(song.duration)}</span
 								>
 							</Button>
@@ -103,6 +103,7 @@
 								variant="outline"
 								size="icon"
 								class="bg-background hover:bg-muted/20 dark:bg-background dark:hover:bg-muted/20"
+								onclick={() => playSong(album.songs[0],album.songs,0)}
 							>
 								<PlayerPlay class="fill-primary stroke-primary  h-4 w-4" />
 							</Button>

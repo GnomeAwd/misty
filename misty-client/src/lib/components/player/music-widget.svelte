@@ -109,12 +109,12 @@
 
 <div class="fixed bottom-0 left-0 z-[999] w-full p-2 ">
 	<div class="bg-muted dark:bg-background  h-full w-full rounded-lg">
-		<div class="flex h-[8.5vh] w-full items-center justify-between gap-4 px-2">
-			<div class="flex w-[300px] items-center justify-start gap-2 hover:bg-muted/20 rounded-md">
+		<div class="flex h-[8.5vh] w-full items-center justify-between gap-4 px-4 pl-2">
+			<div class="flex w-[300px] items-center justify-start gap-2 hover:bg-muted/20 rounded-md p-2">
 				<img
 					src={albumArt}
 					alt="album_art"
-					class="w-18 h-18 object-cover object-center rounded-md"
+					class="aspect-square h-13 object-cover object-center rounded-md"
 				/>
 				<div class="flex flex-col items-start justify-between gap-1">
 					<span class="text-base font-bold w-[150px] truncate">{currentSong?.title || 'No song selected'}</span>
@@ -136,20 +136,20 @@
 				></audio>
 				
 				<Button 
-					variant="outline" 
+					variant="ghost" 
 					size="icon" 
 					onclick={toggleShuffle}
-					class={isShuffled ? 'bg-primary text-primary-foreground' : ''}
+					class={isShuffled ? 'text-primary' : 'text-muted-foreground'}
 				>
 					<ArrowsShuffle class="h-5 w-5" />
 				</Button>
 				
-				<Button variant="outline" size="icon" onclick={previousSong}>
+				<Button variant="ghost" size="icon" onclick={previousSong}>
 					<PlayerSkipBack class="h-5 w-5" />
 				</Button>
 				
 				<Button 
-					variant="outline" 
+					variant="ghost" 
 					size="icon" 
 					class="h-12 w-12" 
 					onclick={togglePlayPause}
@@ -158,21 +158,21 @@
 					{#if isLoading}
 						<div class="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent"></div>
 					{:else if isPlaying}
-						<PlayerPause class="h-5 w-5" />
+						<PlayerPause class="h-5 w-5 scale-150" />
 					{:else}
-						<PlayerPlay class="h-5 w-5" />
+						<PlayerPlay class="h-5 w-5 scale-150" />
 					{/if}
 				</Button>
 				
-				<Button variant="outline" size="icon" onclick={nextSong}>
+				<Button variant="ghost" size="icon" onclick={nextSong}>
 					<PlayerSkipForward class="h-5 w-5" />
 				</Button>
 				
 				<Button 
-					variant="outline" 
+					variant="ghost" 
 					size="icon" 
 					onclick={toggleRepeat}
-					class={repeatMode !== 'none' ? 'bg-primary text-primary-foreground relative' : ''}
+					class={repeatMode !== 'none' ? 'text-primary relative' : 'text-muted-foreground'}
 				>
 					<Repeat class="h-5 w-5" />
 					{#if repeatMode === 'one'}
@@ -181,7 +181,7 @@
 				</Button>
 			</div>
 			<div class="flex flex-1 items-center justify-center gap-4">
-				<span class="text-muted-foreground text-sm">{formatTime(currentTime)}</span>
+				<span class="text-muted-foreground text-xs font-semibold w-[50px] text-center">{formatTime(currentTime)}</span>
 				<button 
 					class="flex-1 cursor-pointer bg-transparent border-none p-0 m-0"
 					onclick={handleProgressClick}
@@ -194,13 +194,13 @@
 				>
 					<Progress value={progressPercentage} />
 				</button>
-				<span class="text-muted-foreground text-sm">{formatTime(duration)}</span>
+				<span class="text-muted-foreground text-xs font-semibold w-[50px] text-center">{formatTime(duration)}</span>
 			</div>
 			<div class="flex items-center justify-center gap-2">
-				<Button variant="outline" size="icon">
+				<Button variant="ghost" size="icon">
 					<List class="h-5 w-5" />
 				</Button>
-				<Button variant="outline" size="icon" onclick={toggleMute}>
+				<Button variant="ghost" size="icon" onclick={toggleMute}>
 					{#if isMuted}
 						<VolumeOff class="h-5 w-5" />
 					{:else}
