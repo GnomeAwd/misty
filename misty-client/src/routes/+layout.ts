@@ -10,3 +10,6 @@ export const load: LayoutLoad = async ({ fetch }) => {
     const albums = await response2.json();
     return { artists, albums };
 };
+
+const ssr = false;
+const prerender = false;
