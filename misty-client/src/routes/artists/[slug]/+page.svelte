@@ -33,7 +33,7 @@
 
     const playAllArtistSongs = () => {
         if (!artist || !songs) return;
-        playSong(songs[0], songs);
+        playSong(songs[0], songs,0);
     };
 
 </script>
@@ -54,7 +54,7 @@
                     <Heart/>
                 </Button>
             </div>
-            <div class="w-full grid grid-cols-3 gap-12">
+            <div class="w-full grid grid-cols-1 xl:grid-cols-3 gap-12">
                 <div class="col-span-1 flex flex-col items-start justify-start gap-2">
                     <span class="text-2xl font-bold">{artist.name}</span>
                     <div class="flex gap-2 items-center justify-start">
