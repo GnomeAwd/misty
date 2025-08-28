@@ -145,7 +145,7 @@
 				</Button>
 				
 				<Button variant="ghost" size="icon" onclick={previousSong}>
-					<PlayerSkipBack class="h-5 w-5" />
+					<PlayerSkipBack class="h-5 w-5 fill-foreground" />
 				</Button>
 				
 				<Button 
@@ -158,14 +158,14 @@
 					{#if isLoading}
 						<div class="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent"></div>
 					{:else if isPlaying}
-						<PlayerPause class="h-5 w-5 scale-150" />
+						<PlayerPause class="h-5 w-5 scale-150 fill-foreground" />
 					{:else}
-						<PlayerPlay class="h-5 w-5 scale-150" />
+						<PlayerPlay class="h-5 w-5 scale-150 fill-foreground" />
 					{/if}
 				</Button>
 				
 				<Button variant="ghost" size="icon" onclick={nextSong}>
-					<PlayerSkipForward class="h-5 w-5" />
+					<PlayerSkipForward class="h-5 w-5 fill-foreground" />
 				</Button>
 				
 				<Button 
