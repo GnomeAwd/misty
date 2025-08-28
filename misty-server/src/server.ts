@@ -7,7 +7,7 @@ import { getAllSongs, getAllSongsByArtistId } from "./getters/songs";
 import { playSong } from "./player";
 import pino from "pino";
 import { getAllArtists, getArtistById } from "./getters/artists";
-import { getAllAlbumsByArtistId } from "./getters/albums";
+import { getAllAlbums, getAllAlbumsByArtistId } from "./getters/albums";
 
 const logger = pino();
 
@@ -53,6 +53,15 @@ app.get("/api/get-all-artists", async (c) => {
     return c.json(artists);
   } catch (err) {
     return c.json({ error: "Failed to fetch artists" }, 500);
+  }
+});
+
+app.get("/api/get-all-albums", async (c) => {
+  try {
+    const albums = await getAllAlbums();
+    return c.json(albums);
+  } catch (err) {
+    return c.json({ error: "Failed to fetch albums" }, 500);
   }
 });
 
