@@ -5,6 +5,8 @@
 	import { Button } from '../ui/button';
 	import ArrowsShuffle_2 from '@tabler/icons-svelte/icons/arrows-shuffle-2';
 	import Heart from '@tabler/icons-svelte/icons/heart';
+	import { playSong } from '$lib/hooks/music/music-player.svelte';
+	import ExternalLink from '@tabler/icons-svelte/icons/external-link';
 
 	let {
 		albums,
@@ -56,13 +58,10 @@
 		return new Date(dateString).toLocaleString(undefined, options);
 	};
 
-	$effect(() => {
-		console.log(albumsWithSongs);
-	});
 </script>
 
-<ScrollArea class="h-[50vh] w-full pr-4">
-	<Accordion.Root type="single" class="w-full" value="item-{albumsWithSongs[0].id}">
+<ScrollArea class="h-[58vh] w-full pr-4">
+	<Accordion.Root type="single" class="w-full" >
 		{#each albumsWithSongs as album}
 			<Accordion.Item value={`item-${album.id}`}>
 				<Accordion.Trigger class="hover:no-underline">
@@ -71,17 +70,18 @@
 						<span class="text-muted-foreground text-right text-sm font-medium"
 							>{formatSecondCount(album.totalDuration)}</span
 						>
-						<span class="text-muted-foreground text-right text-sm font-light">
+						<!-- <span class="text-muted-foreground text-center text-sm font-light">
 							{album.songs.length}
 							{album.songs.length === 1 ? 'song' : 'songs'}
-						</span>
+						</span> -->
 					</div>
 				</Accordion.Trigger>
 				<Accordion.Content class="grid w-full grid-cols-3">
 					<div class="col-span-2 flex flex-col gap-2 pr-4">
-						{#each album.songs as song}
+						{#each album.songs as song,i}
 							<Button
 								variant="ghost"
+								onclick={() => playSong(song,album.songs,i)}
 								class="bg-muted dark:bg-background hover:bg-card hover:text-foreground group flex w-full items-center justify-start rounded-lg px-4 py-2"
 							>
 								<div class="relative w-12">
@@ -97,7 +97,7 @@
 							</Button>
 						{/each}
 					</div>
-					<div class="col-span-1 flex flex-col items-end justify-start gap-4">
+					<div class="col-span-1 flex flex-col items-center justify-start gap-4">
 						<div class="flex items-center justify-center gap-2">
 							<Button
 								variant="outline"
@@ -120,6 +120,14 @@
 							>
 								<Heart class="fill-primary stroke-primary  h-4 w-4" />
 							</Button>
+							<Button
+								variant="outline"
+								size="icon"
+								class="bg-background hover:bg-muted/20 dark:bg-background dark:hover:bg-muted/20"
+							>
+								<ExternalLink class="fill-primary stroke-primary  h-4 w-4" />
+							</Button>
+
 						</div>
 						<div class="w-[200px] overflow-hidden rounded-lg border-2">
 							<img src={album.albumArtUrl} alt="{album.title} cover" class="object-cover" />

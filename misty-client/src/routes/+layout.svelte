@@ -8,7 +8,9 @@
 	import MusicWidget from '$lib/components/player/music-widget.svelte';
 
 
-	let { children } = $props();
+	let { children , data} = $props();
+
+  let { artists, albums } = data;
 </script>
 
 <svelte:head>
@@ -25,5 +27,5 @@
       </ScrollArea>
 		</div>
 	</Sidebar.Inset>
-  <MusicWidget />
+  <MusicWidget {artists} {albums} />
 </Sidebar.Provider>

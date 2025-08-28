@@ -7,6 +7,7 @@
 	import ArtistAlbumAccordion from "$lib/components/artists/artist-album-accordion.svelte";
 	import Circle from "@tabler/icons-svelte/icons/circle";
 	import Separator from "$lib/components/ui/separator/separator.svelte";
+	import { playSong } from "$lib/hooks/music/music-player.svelte";
 
 
     let { data }: { data: PageData } = $props();
@@ -24,7 +25,17 @@
 		return `${hour === 0 ? '' : hour + 'hr '}${minute}min ${second}sec`;
 	};
 
-    $inspect(artist)
+    const playArtistShuffledPlaylist = () => {
+        if (!artist || !songs) return;
+        const shuffledSongs = [...songs].sort(() => Math.random() - 0.5);
+        playSong(shuffledSongs[0], shuffledSongs);
+    };
+
+    const playAllArtistSongs = () => {
+        if (!artist || !songs) return;
+        playSong(songs[0], songs);
+    };
+
 </script>
 <div class="flex flex-col items-start justify-start w-full h-[90.5vh] bg-muted dark:bg-background gap-4">
     <div class="w-full relative h-48 overflow-hidden">
@@ -33,10 +44,10 @@
     </div>
         <div class="w-full relative p-12">
             <div class="flex w-full items-center justify-start gap-4 absolute -top-8 left-0 px-12">
-                <Button class="rounded-full h-16 w-16">
+                <Button class="rounded-full h-16 w-16" onclick={playAllArtistSongs}>
                     <PlayerPlay class="scale-150 fill-background" />
                 </Button>
-                <Button variant="outline" class="rounded-full h-12 w-12">
+                <Button variant="outline" class="rounded-full h-12 w-12" onclick={playArtistShuffledPlaylist}>
                     <ArrowsShuffle_2/>
                 </Button>
                 <Button variant="outline" class="rounded-full h-12 w-12">
