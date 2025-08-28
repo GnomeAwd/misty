@@ -90,7 +90,7 @@
 										class="fill-primary stroke-primary absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform opacity-0 group-hover:opacity-100"
 									/>
 								</div>
-								<span class="w-[200px] truncate text-left">{song.title}</span>
+								<span class="w-[300px] truncate text-left">{song.title}</span>
 								<span class="text-muted-foreground w-full text-right text-sm font-light"
 									>{formatSecondCount(song.duration)}</span
 								>
