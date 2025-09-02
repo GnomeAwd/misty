@@ -3,11 +3,11 @@ import { serveStatic } from "hono/bun";
 import { cors } from "hono/cors";
 import { scan } from "./scanner";
 import { timeout } from "hono/timeout";
-import { getAllSongs, getAllSongsByArtistId } from "./getters/songs";
+import { getAllSongs, getAllSongsByAlbumId, getAllSongsByArtistId } from "./getters/songs";
 import { playSong } from "./player";
 import pino from "pino";
 import { getAllArtists, getArtistById } from "./getters/artists";
-import { getAllAlbums, getAllAlbumsByArtistId } from "./getters/albums";
+import { getAlbumById, getAllAlbums, getAllAlbumsByArtistId } from "./getters/albums";
 
 const logger = pino();
 
@@ -64,6 +64,33 @@ app.get("/api/get-all-albums", async (c) => {
     return c.json({ error: "Failed to fetch albums" }, 500);
   }
 });
+
+app.get("/api/get-album/:id", async (c) => {
+  const id = c.req.param("id");
+  if (!id) {
+    return c.json({ error: "Album ID is required" }, 400);
+  }
+  try {
+    const album = await getAlbumById(Number(id));
+    return c.json(album);
+  } catch (err) {
+    return c.json({ error: "Failed to fetch album" }, 500);
+  }
+});
+
+app.get("/api/get-songs-in-album/:id", async (c) => {
+  const id = c.req.param("id");
+  if (!id) {
+    return c.json({ error: "Album ID is required" }, 400);
+  }
+  try {
+    const songs = await getAllSongsByAlbumId(Number(id));
+    return c.json(songs);
+  } catch (err) {
+    return c.json({ error: "Failed to fetch songs" }, 500);
+  }
+});
+
 
 app.get("/api/get-artist/:id", async (c) => {
   const id = c.req.param("id");
