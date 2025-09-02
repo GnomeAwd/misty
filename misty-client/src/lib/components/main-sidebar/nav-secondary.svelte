@@ -40,7 +40,7 @@
 		<Sidebar.Menu>
 			<Sidebar.MenuItem>
 				<div class="mt-4 flex w-full items-center justify-between">
-					<Button variant="ghost" size="icon" href="/liked">
+					<Button variant="ghost" size="icon" href="/favorites">
 						<Heart class="h-5 w-5"/>
 					</Button>
 					<Button variant="ghost" size="icon">
