@@ -3,7 +3,7 @@ import { serveStatic } from "hono/bun";
 import { cors } from "hono/cors";
 import { scan } from "./scanner";
 import { timeout } from "hono/timeout";
-import { getAllSongs, getAllSongsByAlbumId, getAllSongsByArtistId } from "./getters/songs";
+import { getAllLikedSongs, getAllSongs, getAllSongsByAlbumId, getAllSongsByArtistId, likeSong, unlikeSong } from "./getters/songs";
 import { playSong } from "./player";
 import pino from "pino";
 import { getAllArtists, getArtistById } from "./getters/artists";
@@ -153,6 +153,34 @@ app.get("/api/play-song/:id", async (c) => {
   }
   if (!songData) {
     return c.json({ error: "Song not found" }, 404);
+  }
+});
+
+
+app.get("/api/like-song/:id", async (c) => {
+  const id = c.req.param("id");
+  if (!id) {
+    return c.json({ error: "Song ID is required" }, 400);
+  }
+  await likeSong(Number(id));
+  return c.json({ success: true });
+});
+
+app.get("/api/unlike-song/:id", async (c) => {
+  const id = c.req.param("id");
+  if (!id) {
+    return c.json({ error: "Song ID is required" }, 400);
+  }
+  await unlikeSong(Number(id));
+  return c.json({ success: true });
+});
+
+app.get("/api/get-all-liked-songs", async (c) => {
+  try {
+    const songs = await getAllLikedSongs();
+    return c.json(songs);
+  } catch (err) {
+    return c.json({ error: "Failed to fetch liked songs" }, 500);
   }
 });
 

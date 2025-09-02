@@ -22,3 +22,16 @@ export const getAllSongsByAlbumId = async (albumId: number) => {
   const songsData = await db.select().from(songs).where(eq(songs.albumId, albumId))
   return songsData
 }
+
+export const getAllLikedSongs = async () => {
+  const songsData = await db.select().from(songs).where(eq(songs.isLiked, true))
+  return songsData
+}
+
+export const likeSong = async (id: number) => {
+  await db.update(songs).set({ isLiked: true }).where(eq(songs.id, id))
+}
+
+export const unlikeSong = async (id: number) => {
+  await db.update(songs).set({ isLiked: false }).where(eq(songs.id, id))
+}

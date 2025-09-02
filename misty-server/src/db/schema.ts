@@ -61,6 +61,7 @@ export const songs = sqliteTable("songs", {
   fileSize: integer("file_size"),
   fileName: text("file_name"),
   filePath: text("file_path"),
+  isLiked: integer("is_liked", { mode: "boolean" }).notNull().default(false),
   albumId: integer("album_id")
     .references(() => albums.id, { onDelete: "cascade" })
     .notNull(),
