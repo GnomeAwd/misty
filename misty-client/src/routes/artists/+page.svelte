@@ -13,7 +13,7 @@
 	let { data }: { data: PageData } = $props();
 	const artists = $derived(data.artists);
 
-    let gridState = $state('grid');
+	let gridState = $state('grid');
 </script>
 
 <div
@@ -36,23 +36,25 @@
 	</div>
 	<ScrollArea class="h-[85%] w-full">
 		{#if artists.length === 0}
-		<div class='flex h-[50vh] items-center justify-center gap-4 flex-col'>
-			<span>No artists found</span>
-			<Button variant="ghost" onclick={()=>scan()}><RotateClockwise class="h-4 w-4"/><span>Rescan</span></Button>
-		</div>
+			<div class="flex h-[50vh] flex-col items-center justify-center gap-4">
+				<span>No artists found</span>
+				<Button variant="ghost" onclick={() => scan()}
+					><RotateClockwise class="h-4 w-4" /><span>Rescan</span></Button
+				>
+			</div>
 		{/if}
-        {#if gridState === 'grid'}
-		<div class="grid grid-cols-5 gap-4">
-			{#each artists as artist}
-				<ArtistGridCard {artist} />
-			{/each}
-		</div>
-        {:else}
-        <div class="flex flex-col gap-4 pr-4">
-            {#each artists as artist}
-                <ArtistListCard {artist} />
-            {/each}
-        </div>
-        {/if}
+		{#if gridState === 'grid'}
+			<div class="grid grid-cols-5 gap-4">
+				{#each artists as artist}
+					<ArtistGridCard {artist} />
+				{/each}
+			</div>
+		{:else}
+			<div class="flex flex-col gap-4 pr-4">
+				{#each artists as artist}
+					<ArtistListCard {artist} />
+				{/each}
+			</div>
+		{/if}
 	</ScrollArea>
 </div>

@@ -13,12 +13,7 @@
 	import Clock from '@tabler/icons-svelte/icons/clock';
 	import DotsVertical from '@tabler/icons-svelte/icons/dots-vertical';
 
-	let {
-	
-		...restProps
-	}:  WithoutChildren<
-		ComponentProps<typeof Sidebar.Group>
-	> = $props();
+	let { ...restProps }: WithoutChildren<ComponentProps<typeof Sidebar.Group>> = $props();
 
 	let res = $state(null);
 
@@ -41,7 +36,7 @@
 			<Sidebar.MenuItem>
 				<div class="mt-4 flex w-full items-center justify-between">
 					<Button variant="ghost" size="icon" href="/favorites">
-						<Heart class="h-5 w-5"/>
+						<Heart class="h-5 w-5" />
 					</Button>
 					<Button variant="ghost" size="icon">
 						<Clock class="h-5 w-5" />

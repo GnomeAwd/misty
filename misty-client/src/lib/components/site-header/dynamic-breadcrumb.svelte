@@ -3,7 +3,7 @@
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
 
 	let { data } = $props<{ data?: any }>();
-	
+
 	interface BreadcrumbItem {
 		label: string;
 		href?: string;
@@ -22,41 +22,41 @@
 
 		if (segments[0] === 'albums') {
 			crumbs.push({ label: 'Albums', href: '/albums' });
-			
+
 			if (segments.length > 1) {
 				if (pageData?.album && pageData?.artist) {
 					const album = pageData.album;
 					const artist = pageData.artist;
-					
-					crumbs.push({ 
-						label: artist.name || 'Unknown Artist', 
-						href: `/artists/${artist.id}` 
+
+					crumbs.push({
+						label: artist.name || 'Unknown Artist',
+						href: `/artists/${artist.id}`
 					});
-					
-					crumbs.push({ 
-						label: album.title || album.name || 'Unknown Album', 
-						current: true 
+
+					crumbs.push({
+						label: album.title || album.name || 'Unknown Album',
+						current: true
 					});
 				} else {
-					crumbs.push({ 
-						label: 'Album', 
-						current: true 
+					crumbs.push({
+						label: 'Album',
+						current: true
 					});
 				}
 			}
 		} else if (segments[0] === 'artists') {
 			crumbs.push({ label: 'Artists', href: '/artists' });
-			
+
 			if (segments.length > 1) {
 				if (pageData?.artist) {
-					crumbs.push({ 
-						label: pageData.artist.name || 'Unknown Artist', 
-						current: true 
+					crumbs.push({
+						label: pageData.artist.name || 'Unknown Artist',
+						current: true
 					});
 				} else {
-					crumbs.push({ 
-						label: 'Artist', 
-						current: true 
+					crumbs.push({
+						label: 'Artist',
+						current: true
 					});
 				}
 			}
@@ -64,7 +64,7 @@
 			crumbs.push({ label: 'Library', current: true });
 		} else if (segments[0] === 'playlists') {
 			crumbs.push({ label: 'Playlists', href: '/playlists' });
-			
+
 			if (segments.length > 1) {
 				crumbs.push({ label: 'Playlist', current: true });
 			}
@@ -100,7 +100,7 @@
 					<span>{crumb.label}</span>
 				{/if}
 			</Breadcrumb.Item>
-			
+
 			{#if index < breadcrumbs.length - 1}
 				<Breadcrumb.Separator />
 			{/if}

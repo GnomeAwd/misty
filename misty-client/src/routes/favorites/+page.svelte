@@ -64,10 +64,10 @@
 				{/if}
 			{/each}
 		</div>
-		<div class="flex flex-col items-start justify-center h-36 gap-4 font-semibold">
+		<div class="flex h-36 flex-col items-start justify-center gap-4 font-semibold">
 			<span class="text-4xl font-bold">Liked Songs</span>
 			<div class="flex items-center justify-center gap-4">
-				<Button class="bg-primary rounded-full h-12 w-12">
+				<Button class="bg-primary h-12 w-12 rounded-full">
 					<PlayerPlayFilled class="h-4 w-4" />
 				</Button>
 				<Button variant="ghost" class="hover:bg-muted/50">
@@ -76,8 +76,8 @@
 				<Button variant="ghost" class="hover:bg-muted/50">
 					<DotsVertical class="h-4 w-4" />
 				</Button>
-				<span class="text-muted-foreground text-sm ml-2">{songs.length} songs</span>
-				<span class="text-muted-foreground text-sm font-normal ml-2">{totalDuration}</span>
+				<span class="text-muted-foreground ml-2 text-sm">{songs.length} songs</span>
+				<span class="text-muted-foreground ml-2 text-sm font-normal">{totalDuration}</span>
 			</div>
 		</div>
 	</div>
