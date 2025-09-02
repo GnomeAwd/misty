@@ -84,11 +84,11 @@
 					>
 						<div class="flex items-center justify-start gap-4">
 							<div class="flex h-12 w-12 items-center justify-center">
-								<span class="text-muted-foreground text-sm group-hover:hidden"
+								<span class="text-muted-foreground text-sm group-hover:hidden transition-all duration-300 ease-in-out"
 									>{song.trackNumber || 0}</span
 								>
 								<button
-									class="hidden p-2 group-hover:flex"
+									class="hidden p-2 group-hover:flex transition-all duration-300 ease-in-out cursor-pointer"
 									onclick={() => playSong(song, sortedFilteredSongs, song.trackNumber - 1)}
 								>
 									<PlayerPlayFilled class="fill-primary h-4 w-4" />
