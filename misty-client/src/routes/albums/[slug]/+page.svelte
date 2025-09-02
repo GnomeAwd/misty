@@ -10,6 +10,8 @@
 	import DotsVertical from '@tabler/icons-svelte/icons/dots-vertical';
 	import Circle from '@tabler/icons-svelte/icons/circle';
 	import ArrowsShuffle from '@tabler/icons-svelte/icons/arrows-shuffle';
+	import { likeSong, unlikeSong } from '$lib/api/actions';
+	import { invalidateAll, refreshAll } from '$app/navigation';
 
 	let { data }: { data: PageData } = $props();
 
@@ -23,9 +25,12 @@
 		});
 	};
 
-	const sortedFilteredSongs = songs
+	const sortedFilteredSongs = $state(songs
 		.filter((song: any) => song.title)
-		.sort((a: any, b: any) => a.trackNumber - b.trackNumber);
+		.sort((a: any, b: any) => a.trackNumber - b.trackNumber));
+
+
+
 
 	const formatTime = (seconds: number) => {
 		const mins = Math.floor(seconds / 60);
@@ -41,6 +46,20 @@
 	};
 
 	const totalDuration = songs.reduce((acc: number, song: any) => acc + song.duration, 0);
+
+	const toggleLike = async (songId: number) => {
+		const song = sortedFilteredSongs.find((s: any) => s.id === songId);
+		if (song) {
+			if (song.isLiked) {
+				await unlikeSong(songId);
+				sortedFilteredSongs.find((s: any) => s.id === songId).isLiked = false;
+			} else {
+				await likeSong(songId);
+				sortedFilteredSongs.find((s: any) => s.id === songId).isLiked = true;
+			}
+		}
+	};
+
 </script>
 
 <div class="bg-muted dark:bg-background grid h-[90.5vh] w-full grid-cols-5 gap-4 p-12">
@@ -100,8 +119,8 @@
 							<span class="text-muted-foreground mr-4 text-xs font-semibold"
 								>{formatTime(song.duration)}</span
 							>
-							<Button variant="ghost" class="hover:bg-muted/50 p-2">
-								<Heart class="h-4 w-4" />
+							<Button variant="ghost" class="hover:bg-muted/50 p-2" onclick={() => toggleLike(song.id)}>
+								<Heart class="h-4 w-4 {song.isLiked ? 'fill-foreground' : 'fill-transparent'}"/>
 							</Button>
 							<Button variant="ghost" class="hover:bg-muted/50 p-2">
 								<ListTree class="h-4 w-4" />
