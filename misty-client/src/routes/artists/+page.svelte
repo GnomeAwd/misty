@@ -7,8 +7,11 @@
 	import type { PageData } from './$types';
 	import ListDetails from '@tabler/icons-svelte/icons/list-details';
 	import { ScrollArea } from '$lib/components/ui/scroll-area';
+	import ArtistListCard from '$lib/components/artists/artist-list-card.svelte';
 	let { data }: { data: PageData } = $props();
 	const artists = $derived(data.artists);
+
+    let gridState = $state('grid');
 </script>
 
 <div
@@ -20,7 +23,7 @@
 			class="bg-background hover:bg-muted/20 dark:bg-background dark:hover:bg-muted/20"
 			>Filters</Button
 		>
-		<ToggleGroup.Root variant="outline" type="single" value="grid">
+		<ToggleGroup.Root variant="outline" type="single" bind:value={gridState}>
 			<ToggleGroup.Item value="grid" class="p-2">
 				<GridPattern class="h-4 w-4" />
 			</ToggleGroup.Item>
@@ -30,10 +33,18 @@
 		</ToggleGroup.Root>
 	</div>
 	<ScrollArea class="h-[85%] w-full">
+        {#if gridState === 'grid'}
 		<div class="grid grid-cols-5 gap-4">
 			{#each artists as artist}
 				<ArtistGridCard {artist} />
 			{/each}
 		</div>
+        {:else}
+        <div class="flex flex-col gap-4 pr-4">
+            {#each artists as artist}
+                <ArtistListCard {artist} />
+            {/each}
+        </div>
+        {/if}
 	</ScrollArea>
 </div>
