@@ -1,7 +1,7 @@
 <script>
 	import { SiteHeader } from '$lib/components/site-header';
-	let { children } = $props();
+	let { children, data } = $props();
 </script>
 
-<SiteHeader />
+<SiteHeader {data} />
 {@render children?.()}

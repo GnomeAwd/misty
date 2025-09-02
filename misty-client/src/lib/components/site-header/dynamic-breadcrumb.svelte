@@ -24,18 +24,17 @@
 			crumbs.push({ label: 'Albums', href: '/albums' });
 			
 			if (segments.length > 1) {
-				if (pageData?.album) {
+				if (pageData?.album && pageData?.artist) {
 					const album = pageData.album;
-					const artistName = album.expand?.artist?.name || 'Unknown Artist';
-					const artistId = album.artist;
+					const artist = pageData.artist;
 					
 					crumbs.push({ 
-						label: artistName, 
-						href: `/artists/${artistId}` 
+						label: artist.name || 'Unknown Artist', 
+						href: `/artists/${artist.id}` 
 					});
 					
 					crumbs.push({ 
-						label: album.name, 
+						label: album.title || album.name || 'Unknown Album', 
 						current: true 
 					});
 				} else {
@@ -51,7 +50,7 @@
 			if (segments.length > 1) {
 				if (pageData?.artist) {
 					crumbs.push({ 
-						label: pageData.artist.name, 
+						label: pageData.artist.name || 'Unknown Artist', 
 						current: true 
 					});
 				} else {
